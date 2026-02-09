@@ -1,4 +1,4 @@
-"""EOT Home Authentication Handler - Public Client Version."""
+"""EOT HOME Authentication Handler - Public Client Version."""
 from __future__ import annotations
 
 import asyncio
@@ -92,7 +92,7 @@ class EOTAuthHandler:
     async def _async_authenticate(self) -> None:
        """Perform full authentication flow to get tokens."""
        token_data = await self._async_login_get_tokens()
-       print("EOT Home Token Data:", token_data)
+       print("EOT HOME Token Data:", token_data)
        self._update_tokens(token_data)
 
 
@@ -154,7 +154,7 @@ class EOTAuthHandler:
             ) as resp:
 
                 text = await resp.text()
-                print("EOT Home Cognito Token Exchange Response:", text)
+                print("EOT HOME Cognito Token Exchange Response:", text)
 
                 if resp.status in (400, 401):
                     raise ConfigEntryAuthFailed(f"Cognito token exchange failed: {text}")

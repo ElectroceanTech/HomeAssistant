@@ -48,7 +48,7 @@ async def async_setup_entry(
 
 
 class EotHomeCover(EotHomeEntity, CoverEntity):
-    """EOT Home curtain cover - dynamically created."""
+    """EOT HOME curtain cover - dynamically created."""
     
 
     _attr_supported_features = (
@@ -76,7 +76,7 @@ class EotHomeCover(EotHomeEntity, CoverEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
             name=device_data.get("name", "Unknown Cover"),
-            manufacturer=device_data.get("manufacturer", "EOT Home"),
+            manufacturer=device_data.get("manufacturer", "EOT HOME"),
             model=device_data.get("model", "Curtain"),
             sw_version=device_data.get("sw_version"),
         )

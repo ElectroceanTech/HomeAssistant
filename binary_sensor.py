@@ -44,7 +44,7 @@ async def async_setup_entry(
 
 
 class EotHomeMotionSensor(EotHomeEntity, BinarySensorEntity):
-    """EOT Home motion sensor - dynamically created."""
+    """EOT HOME motion sensor - dynamically created."""
 
     def __init__(
         self,
@@ -71,7 +71,7 @@ class EotHomeMotionSensor(EotHomeEntity, BinarySensorEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
             name=device_data.get("name", "Unknown Motion Sensor"),
-            manufacturer=device_data.get("manufacturer", "EOT Home"),
+            manufacturer=device_data.get("manufacturer", "EOT HOME"),
             model=device_data.get("model", "Motion Sensor"),
             sw_version=device_data.get("sw_version"),
             hw_version=device_data.get("hw_version"),

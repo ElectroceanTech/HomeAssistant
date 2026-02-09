@@ -45,7 +45,7 @@ async def async_setup_entry(
 
 
 class EotHomeScene(EotHomeEntity, Scene):
-    """EOT Home scene - dynamically created."""
+    """EOT HOME scene - dynamically created."""
 
     def __init__(
         self,
@@ -67,7 +67,7 @@ class EotHomeScene(EotHomeEntity, Scene):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
             name=device_data.get("name", "Unknown Scene"),
-            manufacturer=device_data.get("manufacturer", "EOT Home"),
+            manufacturer=device_data.get("manufacturer", "EOT HOME"),
             model=device_data.get("model", "Scene"),
             sw_version=device_data.get("sw_version"),
         )

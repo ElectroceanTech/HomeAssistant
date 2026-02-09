@@ -18,7 +18,7 @@ type EotHomeConfigEntry = ConfigEntry[EotHomeData]
 
 @dataclass
 class EotHomeData:
-    """Data for the Eot integration."""
+    """Data for the EOT integration."""
 
     client: EotHomeApiClient
     coordinator: EotDataUpdateCoordinator

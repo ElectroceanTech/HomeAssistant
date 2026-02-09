@@ -44,7 +44,7 @@ async def async_setup_entry(
 
 
 class EotHomeSwitch(EotHomeEntity, SwitchEntity):
-    """EOT Home switch - dynamically created."""
+    """EOT HOME switch - dynamically created."""
 
     def __init__(
         self,
@@ -68,7 +68,7 @@ class EotHomeSwitch(EotHomeEntity, SwitchEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
             name=device_data.get("name", "Unknown Device"),
-            manufacturer=device_data.get("manufacturer", "EOT Home"),
+            manufacturer=device_data.get("manufacturer", "EOT HOME"),
             model=device_data.get("model", "Switch"),
             sw_version=device_data.get("sw_version"),
             hw_version=device_data.get("hw_version"),

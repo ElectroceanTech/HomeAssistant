@@ -42,7 +42,7 @@ async def async_setup_entry(
     hass: HomeAssistant,
     entry: EotHomeConfigEntry,
 ) -> bool:
-    """Set up EOT Home from a config entry."""
+    """Set up EOT HOME from a config entry."""
 
     session = async_get_clientsession(hass)
     
@@ -92,7 +92,7 @@ async def async_setup_entry(
 
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
-    LOGGER.info("EOT Home integration setup completed")
+    LOGGER.info("EOT HOME integration setup completed")
     return True
 
 
@@ -101,9 +101,9 @@ async def async_unload_entry(
     hass: HomeAssistant,
     entry: EotHomeConfigEntry,
 ) -> bool:
-    """Unload EOT Home integration."""
+    """Unload EOT HOME integration."""
 
-    LOGGER.info("Unloading EOT Home integration")
+    LOGGER.info("Unloading EOT HOME integration")
 
     api_client = entry.runtime_data.client
 

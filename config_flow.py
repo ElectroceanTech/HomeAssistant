@@ -1,4 +1,4 @@
-"""Adds config flow for EOT Home."""
+"""Adds config flow for EOT HOME."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from .const import DOMAIN, LOGGER
 
 
 class EotFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for EOT Home."""
+    """Config flow for EOT HOME."""
     VERSION = 1
 
     async def async_step_user(

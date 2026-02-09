@@ -49,7 +49,7 @@ async def async_setup_entry(
 
 
 class EotHomeFan(EotHomeEntity, FanEntity):
-    """EOT Home fan - dynamically created."""
+    """EOT HOME fan - dynamically created."""
 
     _attr_supported_features = (
         FanEntityFeature.SET_SPEED | 
@@ -77,7 +77,7 @@ class EotHomeFan(EotHomeEntity, FanEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
             name=device_data.get("name", "Unknown Fan"),
-            manufacturer=device_data.get("manufacturer", "EOT Home"),
+            manufacturer=device_data.get("manufacturer", "EOT HOME"),
             model=device_data.get("model", "Fan"),
             sw_version=device_data.get("sw_version"),
         )

@@ -53,7 +53,7 @@ async def async_setup_entry(
 
 
 class EotHomeLight(EotHomeEntity, LightEntity):
-    """EOT Home dimmer light - dynamically created."""
+    """EOT HOME dimmer light - dynamically created."""
 
     _attr_color_mode = ColorMode.COLOR_TEMP
     _attr_supported_color_modes = {ColorMode.COLOR_TEMP}
@@ -81,7 +81,7 @@ class EotHomeLight(EotHomeEntity, LightEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},
             name=device_data.get("name", "Unknown Light"),
-            manufacturer=device_data.get("manufacturer", "EOT Home"),
+            manufacturer=device_data.get("manufacturer", "EOT HOME"),
             model=device_data.get("model", "Dimmer"),
             sw_version=device_data.get("sw_version"),
         )

@@ -1,4 +1,4 @@
-"""EOT Home API Client with AWS IoT MQTT Integration for Real-time State Updates."""
+"""EOT HOME API Client with AWS IoT MQTT Integration for Real-time State Updates."""
 from __future__ import annotations
 import socket
 import json
@@ -205,7 +205,7 @@ class DeviceConverter:
 
 
 class EotHomeApiClient:
-    """EOT Home API Client with real-time AWS IoT MQTT sync."""
+    """EOT HOME API Client with real-time AWS IoT MQTT sync."""
 
     def __init__(
         self,
