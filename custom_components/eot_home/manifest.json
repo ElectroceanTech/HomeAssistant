@@ -1,16 +1,12 @@
 {
   "domain": "eot_home",
   "name": "EOT HOME",
-  "codeowners": [
-    "@ElectroceanTech"
-  ],
+  "codeowners": ["@ElectroceanTech"],
   "config_flow": true,
   "documentation": "https://github.com/ElectroceanTech/HomeAssistant",
   "integration_type": "hub",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/ElectroceanTech/HomeAssistant/issues",
-  "requirements": [
-    "paho-mqtt==2.1.0"
-  ],
-  "version": "1.0.0"
+  "requirements": ["paho-mqtt==2.1.0"],
+  "version": "1.0.1"
 }
