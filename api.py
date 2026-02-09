@@ -39,7 +39,6 @@ def _verify_response_or_raise(response: aiohttp.ClientResponse) -> None:
         raise EotHomeApiClientAuthenticationError(msg)
     response.raise_for_status()
 
-
 class DeviceConverter:
     """Convert between Google Assistant and Home Assistant device types."""
     
@@ -50,6 +49,7 @@ class DeviceConverter:
         "action.devices.types.FAN": "fan",
         "action.devices.types.CURTAIN": "cover",
         "action.devices.types.SCENE": "scene",
+        "action.devices.types.SENSOR": "binary_sensor",  # Added motion sensor
     }
     
     # Map Home Assistant domains to Google Assistant device types
@@ -103,6 +103,8 @@ class DeviceConverter:
             capabilities.append("position")
         if "action.devices.traits.Scene" in traits:
             capabilities.append("scene")
+        if "action.devices.traits.OccupancySensing" in traits:  # Added motion sensor trait
+            capabilities.append("occupancy")
             
         ha_device["capabilities"] = capabilities
         ha_device["original_type"] = device_type
@@ -115,6 +117,11 @@ class DeviceConverter:
                 ha_device["state"] = "off"
             else:
                 ha_device["state"] = "unknown"
+        
+        # Motion sensors have default state
+        if ha_device["type"] == "binary_sensor" and "occupancy" in capabilities:
+            ha_device["state"] = "not_detected"
+            ha_device["available"] = True
         
         return ha_device
     
@@ -169,6 +176,16 @@ class DeviceConverter:
             ha_state["current_position"] = ga_state["openPercent"]
             ha_state["state"] = "open" if ga_state["openPercent"] > 0 else "closed"
         
+        # Motion/Occupancy sensor state (Google Home)
+        if "occupancy" in ga_state:
+            occupancy_state = ga_state["occupancy"]
+            if occupancy_state == "OCCUPIED":
+                ha_state["state"] = "detected"
+            elif occupancy_state == "UNOCCUPIED":
+                ha_state["state"] = "not_detected"
+            else:
+                ha_state["state"] = "not_detected"
+        
         return ha_state
     
     @staticmethod
@@ -185,9 +202,6 @@ class DeviceConverter:
             "eco": "eco",
         }
         return mode_map.get(ga_mode, "auto")
-
-
-
 
 
 class EotHomeApiClient:
@@ -216,6 +230,7 @@ class EotHomeApiClient:
         self.curtain_keys = ["c0","c1"]
         self.dimmer_keys = ["dimmer"]
         self.fan_keys = ["fan"]
+        self.motion_sensor_keys = ["motionSensor"]
 
     # -------------------------------------------------
     # HA lifecycle injection
@@ -246,7 +261,6 @@ class EotHomeApiClient:
         )
     
       
-
     async def _async_process_mqtt_message(self, topic: str, payload: str) -> None:
       
 
@@ -265,32 +279,34 @@ class EotHomeApiClient:
       curtain = next((k for k in self.curtain_keys if k in data), None)
       dimmer = next((k for k in self.dimmer_keys if k in data), None)
       fan = next((k for k in self.fan_keys if k in data), None)
-      if  relay: 
+      motionSensor = next((k for k in self.motion_sensor_keys if k in data), None)
+      
+      if relay: 
         switches = self._coordinator.data.setdefault("switches", {})
-        for key  in self.relay_keys :
-          if key in data : 
+        for key in self.relay_keys:
+          if key in data: 
              device_id = f"{self._user_email}-{d_id}-{key}"
              
-             switch=switches.get(device_id,{})
-             if switch :
+             switch = switches.get(device_id, {})
+             if switch:
                switch["state"] = "on" if str(data[key]) == "1" else "off"
-          else :
+          else:
               continue
+              
       elif curtain:
-
         curtains = self._coordinator.data.setdefault("covers", {})
-        for key  in self.curtain_keys :
-          if key in data : 
+        for key in self.curtain_keys:
+          if key in data: 
              device_id = f"{self._user_email}-{d_id}-{key}"
              
-             curtain=curtains.get(device_id,{})
-             if curtain :
+             curtain = curtains.get(device_id, {})
+             if curtain:
                curtain["position"] = 100 if str(data[key]) == "1" else 0
-               curtain["is_closed"] =False if str(data[key]) == "1" else True
-          else :
+               curtain["is_closed"] = False if str(data[key]) == "1" else True
+          else:
               continue
+              
       elif dimmer:  
-
         LIGHT_TYPE_TO_COLOR_TEMP = {
             3: 2500,  # warmWhite
             5: 3200,  # softWhite
@@ -299,35 +315,48 @@ class EotHomeApiClient:
             1: 5000,  # naturalWhite
         }
         dimmers = self._coordinator.data.setdefault("lights", {})
-        for key  in self.dimmer_keys :
-          if key in data : 
+        for key in self.dimmer_keys:
+          if key in data: 
              device_id = f"{self._user_email}-{d_id}-{key}"
-             bri = int(data.get("brightNess","0"))
-             per =  0 if not 0 <= bri <= 255 else round((bri / 255) * 100)
-             dimmer=dimmers.get(device_id,{})
-             if dimmer :
+             bri = int(data.get("brightNess", "0"))
+             per = 0 if not 0 <= bri <= 255 else round((bri / 255) * 100)
+             dimmer = dimmers.get(device_id, {})
+             if dimmer:
                dimmer["state"] = "on" if str(data[key]) == "1" else "off"
                dimmer["brightness"] = per
-               dimmer["color_temp"] = LIGHT_TYPE_TO_COLOR_TEMP.get(int(data["lightType"]),3800)
+               dimmer["color_temp"] = LIGHT_TYPE_TO_COLOR_TEMP.get(int(data["lightType"]), 3800)
               
-          else :
+          else:
               continue 
+              
       elif fan: 
         fans = self._coordinator.data.setdefault("fans", {})
-        for key  in self.fan_keys :
-          if key in data : 
+        for key in self.fan_keys:
+          if key in data: 
              device_id = f"{self._user_email}-{d_id}-{key}"
-             percentage=int(data.get("fanspeed","0"))*25
-             fan=fans.get(device_id,{})
-             if fan :
+             percentage = int(data.get("fanspeed", "0")) * 25
+             fan = fans.get(device_id, {})
+             if fan:
                fan["state"] = "on" if str(data[key]) == "1" else "off"
                fan["percentage"] = percentage
-          else :
-              continue  
+          else:
+              continue
+              
+      elif motionSensor:
+        motion_sensors = self._coordinator.data.setdefault("motion_sensors", {})
+        for key in self.motion_sensor_keys:
+          if key in data:
+             device_id = f"{self._user_email}-{d_id}-{key}"
+             
+             sensor = motion_sensors.get(device_id, {})
+             if sensor:
+               # Convert motion sensor value to detected/not_detected
+               # Assuming: "1" = detected, "0" = not_detected
+               sensor["state"] = "detected" if str(data[key]) == "1" else "not_detected"
+          else:
+              continue
 
       self._coordinator.async_set_updated_data(self._coordinator.data)
-   
-
     def start_mqtt(self) -> None:
         """Start AWS IoT MQTT client (HA-safe, non-blocking)."""
         if not self._enable_mqtt or self._mqtt:

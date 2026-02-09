@@ -51,23 +51,24 @@ class EotDataUpdateCoordinator(DataUpdateCoordinator):
                 "fans": {},
                 "covers": {},
                 "scenes": {},
-                "binary_sensors": {},
+                "motion_sensors": {},  # Changed from binary_sensors to motion_sensors
                 "sensors": {},
             }
             
             for device in devices:
                 device_id = device.get("id")
                 device_type = device.get("type", "switch")  
+                capabilities = device.get("capabilities", [])
 
                 cached_state = self.apiClient.get_cached_device_state(device_id)
                 if cached_state:
-
                     ha_state = DeviceConverter.convert_ga_state_to_ha(
                         cached_state,
                         device_type
                     )
                     device.update(ha_state)
                 
+                # Route devices to appropriate categories
                 if device_type == "light":
                     organized_data["lights"][device_id] = device
                 elif device_type == "switch":
@@ -78,7 +79,15 @@ class EotDataUpdateCoordinator(DataUpdateCoordinator):
                     organized_data["covers"][device_id] = device
                 elif device_type == "scene":
                     organized_data["scenes"][device_id] = device
+                elif device_type == "binary_sensor":
+                    # Check if it's a motion sensor specifically
+                    if "occupancy" in capabilities:
+                        organized_data["motion_sensors"][device_id] = device
+                    else:
+                        # Other binary sensors can go here
+                        organized_data["sensors"][device_id] = device
                 else:
+                    # Default fallback
                     organized_data["switches"][device_id] = device
             
             return organized_data
