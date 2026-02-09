@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/ElectroceanTech/HomeAssistant",
+                "description": "If you need help with the configuration please check our github repo.",
                 "data": {
                     "username": "Username",
                     "password": "Password"
