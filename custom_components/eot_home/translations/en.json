@@ -2,7 +2,7 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration please check our github repo.",
+                "description": "If you need help with the configuration please check our GitHub repo.",
                 "data": {
                     "username": "Username",
                     "password": "Password"
