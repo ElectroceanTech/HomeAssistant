@@ -1,68 +1,89 @@
 # EOT Home Integration for Home Assistant
 
-A Home Assistant custom integration for EOT Home smart devices with optional real-time MQTT updates.
+> **Version 2.0.0** — Add your EOT Home smart devices to Home Assistant with real-time MQTT updates and full voice assistant compatibility.
 
-## Features
+---
+
+## 🏠 Add to Home Assistant
+
+[![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=eot_home)
+
+Click the button above to directly add **EOT Home** to Home Assistant.
+
+---
+
+## 🚀 Installation (HACS)
+
+### Install via HACS (Official Method)
+
+1. Open **HACS**
+2. Go to **Integrations**
+3. Click **Explore & Download Repositories**
+4. Search for **EOT Home**
+5. Click **Download**
+6. Restart Home Assistant
+7. Go to **Settings → Devices & Services**
+8. Click **Add Integration**
+9. Search for **EOT Home**
+10. Enter your credentials
+
+---
+
+## ✨ Features
 
 - ✅ Control lights, switches, fans, covers, and scenes
 - ✅ Brightness and color temperature control
-- ✅ Fan speed control
+- ✅ Fan speed control (0–100%)
 - ✅ Cover/curtain position control
 - ✅ Scene activation
 - ✅ Real-time state updates via MQTT
-- ✅ Google Assistant device compatibility
-- ✅ Alexa device compatibility
+- ✅ Google Assistant compatibility
+- ✅ Alexa compatibility
 
-## Installation
+---
 
-### HACS (Recommended)
+## 🔌 Supported Devices
 
-1. Open HACS in Home Assistant
-2. Go to "Integrations"
-3. Click the three dots in the top right corner
-4. Select "Custom repositories"
-5. Add this repository URL
-6. Click "Install"
-7. Restart Home Assistant
+| Device Type     | Support | Features                                    |
+|-----------------|---------|---------------------------------------------|
+| Lights          | ✅       | On/Off, Brightness, Color Temperature       |
+| Switches        | ✅       | On/Off                                      |
+| Fans            | ✅       | On/Off, Speed Control (0–100%)              |
+| Covers/Curtains | ✅       | Open / Close                                |
+| Scenes          | ✅       | Activate Scene                              |
 
-## Configuration
+---
 
-1. Go to **Settings** → **Devices & Services**
+## ⚙️ Configuration
+
+After installation:
+
+1. Go to **Settings → Devices & Services**
 2. Click **Add Integration**
-3. Search for "EOT Home"
-4. Enter your credentials:
+3. Search for **EOT Home**
+4. Enter:
    - Email
    - Password
 5. Click **Submit**
 
-Your devices will be automatically discovered and added to Home Assistant with real-time MQTT updates enabled.
+Your devices will be automatically discovered and added.
 
-## Supported Devices
+---
 
-| Device Type | Support | Features |
-|-------------|---------|----------|
-| **Lights** | ✅ | On/Off, Brightness, Color Temperature |
-| **Switches** | ✅ | On/Off |
-| **Fans** | ✅ | On/Off, Speed Control (0-100%) |
-| **Covers/Curtains** | ✅ | Open/Close
-| **Scenes** | ✅ | Activate Scene |
+## 🔄 Real-Time MQTT Updates
 
-## Usage
+State updates happen instantly when devices change via:
 
-### Control from Home Assistant
+- EOT Mobile App
+- Google Assistant
+- Alexa
+- Touch Switches
 
-All devices appear in Home Assistant automatically. You can:
+Powered by **AWS IoT Core** secure MQTT connection.
 
-- Turn devices on/off
-- Adjust brightness (lights)
-- Change color temperature (lights)
-- Set fan speed (fans)
-- Open/close covers (curtains)
-- Activate scenes
+---
 
-### Automations
-
-Use your EOT Home devices in Home Assistant automations:
+## 🤖 Automations Example
 
 ```yaml
 automation:
@@ -78,53 +99,21 @@ automation:
           brightness: 255
 ```
 
-## Troubleshooting
+---
 
-### Devices Not Showing Up
+## 📋 Changelog
 
-1. Check your credentials are correct
-2. Restart Home Assistant
-3. Check logs: **Settings** → **System** → **Logs**
+### Version 2.0.0
+- 🆕 Full MQTT real-time state synchronisation via AWS IoT Core
+- 🆕 Cover/curtain position control support
+- 🆕 Scene activation support
+- 🆕 Fan speed control (0–100%)
+- 🆕 Google Assistant & Alexa compatibility
+- ⚡ Improved device discovery and credential flow
+- 🐛 Various stability and reliability fixes
 
-### State Not Updating
+---
 
-States update instantly when devices change externally (via mobile app, voice assistant, or physical controls) through real-time MQTT updates.
-
-## Support
-
-- **Issues**: Report issues on GitHub
-- **Questions**: Open a discussion on GitHub
-
-## Technical Details
-
-### API Integration
-
-This integration uses the EOT Home API with Google Assistant protocol:
-- **SYNC**: Discovers devices
-- **QUERY**: Gets device states
-- **EXECUTE**: Controls devices
-
-### MQTT Integration
-
-Automatically connects to AWS IoT Core for real-time updates:
-- **Endpoint**: AWS IoT MQTT broker
-- **Authentication**: Custom authorizer with token
-- **Protocol**: MQTT over TLS with ALPN
-- **Real-time Updates**: Instant state synchronization when devices change externally
-
-## Version History
-
-### v1.0.0
-- Initial release
-- Support for lights, switches, fans, covers, and scenes
-- Built-in MQTT support for real-time updates
-- Google Assistant and Alexa compatibility
-
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
-
-## Credits
-
-Developed for the EOT Home ecosystem.
-

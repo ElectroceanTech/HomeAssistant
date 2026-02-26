@@ -129,11 +129,13 @@ class AwsIotMqttClient:
         if rc == 0:
             self.connected = True
             client.subscribe(self.sub_topic, qos=1)
+            
 
 
 
     def _on_disconnect(self, client, userdata, rc):
         self.connected = False
+       
 
     def _on_message(self, client, userdata, msg):
         topic = msg.topic

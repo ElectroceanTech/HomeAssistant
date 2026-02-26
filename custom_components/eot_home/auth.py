@@ -92,7 +92,6 @@ class EOTAuthHandler:
     async def _async_authenticate(self) -> None:
        """Perform full authentication flow to get tokens."""
        token_data = await self._async_login_get_tokens()
-       print("EOT HOME Token Data:", token_data)
        self._update_tokens(token_data)
 
 

@@ -307,13 +307,22 @@ class EotHomeApiClient:
               continue
               
       elif dimmer:  
-        LIGHT_TYPE_TO_COLOR_TEMP = {
+        ''' LIGHT_TYPE_TO_COLOR_TEMP = {
             3: 2500,  # warmWhite
             5: 3200,  # softWhite
             2: 3800,  # white
             4: 4400,  # dayLightWhite
             1: 5000,  # naturalWhite
+        } '''
+
+        LIGHT_TYPE_TO_COLOR_TEMP = {
+            2: 5000,  # white
+            4: 4400,  # dayLightWhite
+            1: 3800,  # naturalWhite
+            5: 3200,  # sofWhite
+            3: 2500,  # warmWhite
         }
+
         dimmers = self._coordinator.data.setdefault("lights", {})
         for key in self.dimmer_keys:
           if key in data: 
@@ -500,43 +509,22 @@ class EotHomeApiClient:
     async def async_handle_brightness(
         self,
         device_id: str,
-        brightness: int
+        per : int
     ) -> bool:
         """Set brightness (Home Assistant: 0-255)."""
-
-
-        execution_data = {
-            "requestId": "6894439706274654516",
-            "inputs": [{
-                "intent": "action.devices.EXECUTE",
-                "payload": {
-                    "commands": [{
-                        "devices": [{"id": device_id}],
-                        "execution": [{
-                            "command": "action.devices.commands.BrightnessAbsolute",
-                            "params": {"brightness": brightness}
-                        }]
-                    }]
-                }
-            }]
-        }
+        parts = device_id.split("-")
+        userId= parts[0]
+        dId = parts[1]
+        subDId=parts[2]
+        msg={"d_id":dId, "operationType" : "relayChangeRequest" , "opUsr" : userId}
+        bri = 0 if per == 0 else round((per / 100) * 255)
+        msg["brightNess"]  = str(bri) 
+        return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
         
-        try:
-            api_res = await self._api_wrapper(
-                method="post",
-                url=API_URL,
-                data=execution_data
-            )
-            
-            if api_res and isinstance(api_res, dict):
-                await self._refresh_device_state_after_command(device_id, api_res)
-                return True
-            
-            return False
-            
-        except Exception as e:
+        return False
 
-            return False
+
+
 
     async def async_set_speed(
         self,
@@ -544,220 +532,114 @@ class EotHomeApiClient:
         speed: int
     ) -> bool:
         """Set fan speed by percentage."""
+        parts = device_id.split("-")
+        userId= parts[0]
+        dId = parts[1]
+        subDId=parts[2]
+        msg={"d_id":dId, "operationType" : "relayChangeRequest" , "opUsr" : userId}
+       
+        msg["fan"]  = str(speed)
+        return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
         
 
-        execution_data = {
-            "requestId": "6894439706274654516",
-            "inputs": [{
-                "intent": "action.devices.EXECUTE",
-                "payload": {
-                    "commands": [{
-                        "devices": [{"id": device_id}],
-                        "execution": [{
-                            "command": "action.devices.commands.SetFanSpeed",
-                            "params": {"fanSpeed": speed}
-                        }]
-                    }]
-                }
-            }]
-        }
-        
-        try:
-            api_res = await self._api_wrapper(
-                method="post",
-                url=API_URL,
-                data=execution_data
-            )
-            
-            if api_res and isinstance(api_res, dict):
-                await self._refresh_device_state_after_command(device_id, api_res)
-                return True
-            
-            return False
-            
-        except Exception as e:
 
-            return False
 
     async def async_handle_scene(
         self,
         device_id: str
     ) -> bool:
         """Activate a scene."""
+        parts = device_id.split("-")
+        userId= parts[0]
+        dId = parts[1]
+        subDId=parts[2]
+        msg={"d_id":dId, "operationType" : "sceneExecuteRequestById" , "opUsr" : userId}
+        msg["scId"] = subDId
+        self._mqtt.publish(json.dumps(msg),f"{userId}")
+        return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
 
-        execution_data = {
-            "requestId": "6894439706274654516",
-            "inputs": [{
-                "intent": "action.devices.EXECUTE",
-                "payload": {
-                    "commands": [{
-                        "devices": [{"id": device_id}],
-                        "execution": [{
-                            "command": "action.devices.commands.ActivateScene",
-                            "params": {"deactivate": False}
-                        }]
-                    }]
-                }
-            }]
-        }
-        
-        try:
-            api_res = await self._api_wrapper(
-                method="post",
-                url=API_URL,
-                data=execution_data
-            )
-            
-            if api_res and isinstance(api_res, dict):
-                payload = api_res.get("payload", {})
-                commands = payload.get("commands", [])
-                
-                for command in commands:
-                    if device_id in command.get("ids", []):
-                        if command.get("status") == "SUCCESS":
-                            return True
-            
-            return False
-            
-        except Exception as e:
-            
-            return False
 
-    async def async_handle_color_temp(
-        self,
-        device_id: str,
-        temperature: float
-    ) -> bool:
-        """Set color temperature."""
     
+    
+    async def async_handle_color_temp(
+    self, device_id: str, temperature: float
+) -> bool:
+      """Set color temperature."""
+      parts = device_id.split("-")
+      userId = parts[0]
+      dId = parts[1]
+      subDId = parts[2]
 
-        execution_data = {
-            "requestId": "6894439706274654520",
-            "inputs": [{
-                "intent": "action.devices.EXECUTE",
-                "payload": {
-                    "commands": [{
-                        "devices": [{"id": device_id}],
-                        "execution": [{
-                            "command": "action.devices.commands.ColorAbsolute",
-                            "params": {
-                                "color": {
-                                    "name": "Warm White",
-                                    "temperature": int(temperature)
-                                }
-                            }
-                        }]
-                    }]
-                }
-            }]
-        }
-        
-        try:
-            api_res = await self._api_wrapper(
-                method="post",
-                url=API_URL,
-                data=execution_data
-            )
-            
-            if api_res and isinstance(api_res, dict):
-                await self._refresh_device_state_after_command(device_id, api_res)
-                return True
-            
-            return False
-            
-        except Exception as e:
+      # Hardware light type codes mapped to Kelvin midpoints
+    # 1: naturalWhite  ~5000K
+    # 2: white         ~3800K
+    # 3: warmWhite     ~2500K
+    # 4: dayLightWhite ~4400K
+    # 5: softWhite     ~3200K
+    # white - 5000 ,dayLightWhite,naturalWhite,softWhite,warmWhite - 2500
 
-            return False
+      def get_light_type(temp: float) -> int:
+        if temp >= 4700:       # ~5000K → white
+            return 2
+        elif temp >= 4100:     # ~4400K → dayLightWhite
+            return 4
+        elif temp >= 3500:     # ~3800K → naturalWhite
+            return 1
+        elif temp >= 2850:     # ~3200K → softWhite
+            return 5
+        else:                  # ~2500K → warmWhite
+            return 3
+      light_type = get_light_type(temperature)
+
+      msg = {
+        "d_id": dId,
+        "operationType": "relayChangeRequest",
+        "opUsr": userId,
+        "lightType": str(light_type)
+    }
+
+      return self._mqtt.publish(json.dumps(msg), f"users/{userId}/update/{dId}")
+
 
     async def async_handle_curtain_position(self, device_id: str, position: int) -> bool:
         """Set curtain/cover position."""
+        parts = device_id.split("-")
+        userId= parts[0]
+        dId = parts[1]
+        subDId=parts[2]
+        msg={"d_id":dId, "operationType" : "relayChangeRequest" , "opUsr" : userId}
 
-        execution_data = {
-            "requestId": "6894439706274654516",
-            "inputs": [{
-                "intent": "action.devices.EXECUTE",
-                "payload": {
-                    "commands": [{
-                        "devices": [{"id": device_id}],
-                        "execution": [{
-                            "command": "action.devices.commands.OpenClose",
-                            "params": {"openPercent": position}
-                        }]
-                    }]
-                }
-            }]
-        }
-        
-        try:
-            api_res = await self._api_wrapper(method="post", url=API_URL, data=execution_data)
-            if api_res is None:
-                return False
+        keyList = {
+        "c0": {100: "r1", 0: "r2"},
+        "c1": {100: "r3", 0: "r4"}
+       }
 
-            resJson = json.loads(api_res) if isinstance(api_res, str) else api_res
-            if not isinstance(resJson, dict):
-                return False
-                
-            for command in resJson.get("payload", {}).get("commands", []):
-                if device_id in command.get("ids", []):
-                    states = command.get("states", {})
-                    if states:
-                        self._device_states_cache[device_id] = states
-                    
-                    if command.get("status") != "SUCCESS":
-                        return False
-                    
-                    actual_position = states.get("openPercent")
-                    if actual_position is not None:
+        if subDId in ("c0", "c1"):
+            newSub = keyList[subDId][position]
+            msg[newSub]  = "1"
+            return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
+           
+        return False
 
-                        return True
-            
-            return False
-            
-        except Exception as e:
-            
-            return False
-  
+
+
     async def async_handle_on_off(self, device_id: str, state: bool) -> bool:
-
-        """Turn on/off a device."""
-        execution_data = {
-            "requestId": "6894439706274654516",
-            "inputs": [{
-                "intent": "action.devices.EXECUTE",
-                "payload": {
-                    "commands": [{
-                        "devices": [{"id": device_id}],
-                        "execution": [{
-                            "command": "action.devices.commands.OnOff",
-                            "params": {"on": state}
-                        }]
-                    }]
-                }
-            }]
-        }
-        
-        try:
-            api_res = await self._api_wrapper(method="post", url=API_URL, data=execution_data)
-            if api_res is None:
-                return False
-
-            resJson = json.loads(api_res) if isinstance(api_res, str) else api_res
-            
-            if not isinstance(resJson, dict) or "payload" not in resJson:
-                return False
-            
-            for command in resJson.get("payload", {}).get("commands", []):
-                if device_id in command.get("ids", []):
-                    states = command.get("states", {})
-                    if command.get("status") == "SUCCESS" and states and states.get("online", False) and states.get("on") == state:
-                        self._device_states_cache[device_id] = states
-                        return True
-                    return False
-            
-            return False
-            
-        except Exception:
-            return False
+       parts = device_id.split("-")
+       userId= parts[0]
+       dId = parts[1]
+       subDId=parts[2]
+       msg={"d_id":dId, "operationType" : "relayChangeRequest" , "opUsr" : userId}
+       if subDId in self.relay_keys:
+           msg[subDId]  = "1" if state else "0" 
+           return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
+       elif subDId  in self.fan_keys:
+            msg["r6"]  = "1" if state else "0" 
+            return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
+       elif subDId in self.dimmer_keys:
+               msg["rall"]  = "1" if state else "0" 
+               return self._mqtt.publish(json.dumps(msg),f"users/{userId}/update/{dId}")
+       return False
+       
 
        
 
