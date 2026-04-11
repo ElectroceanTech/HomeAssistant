@@ -87,7 +87,9 @@ class AwsIotMqttClient:
            access_token = loop.run_until_complete(self._auth_handler.async_get_access_token())
         finally:
             loop.close()
-        client_id = f"eotHAClient_{self._user_email}_{self._device_id}"
+        #client_id = f"eotHAClient_{self._user_email}_{self._device_id}"
+        client_id = f"eotHAClient:{self._user_email}:{self._device_id}"
+
 
         encoded_auth = urllib.parse.quote("MyESP32Authorizer")
         encoded_token = urllib.parse.quote(f"Bearer {access_token}")
